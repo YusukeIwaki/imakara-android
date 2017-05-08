@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">imakara</string>
+
+    <!-- 単語(文脈の不要な、ボタンやダイアログのキャプションなど) -->
+
+
+    <!-- 以下、文脈ごとの定義 -->
+    <string name="setup_title_username">表示名</string>
 </resources>

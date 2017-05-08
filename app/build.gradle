@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'io.github.retropiler'
 
 android {
     compileSdkVersion 25
@@ -16,8 +17,24 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+ext {
+    supportLibraryVersion = '25.3.1'
+    firebaseVersion = '10.2.4'
 }
 
 dependencies {
-    compile 'com.android.support:appcompat-v7:25.3.1'
+    compile "com.android.support:appcompat-v7:$supportLibraryVersion"
+    compile "com.android.support:cardview-v7:$supportLibraryVersion"
+    compile "com.google.firebase:firebase-messaging:$firebaseVersion"
+    compile 'com.squareup.okhttp3:okhttp:3.7.0'
+    compile 'com.facebook.stetho:stetho:1.5.0'
+    compile 'com.facebook.stetho:stetho-okhttp3:1.5.0'
 }
+
+apply plugin: 'com.google.gms.google-services'
