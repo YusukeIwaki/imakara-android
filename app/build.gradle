@@ -10,6 +10,8 @@ android {
         targetSdkVersion 25
         versionCode 1
         versionName "1.0"
+
+        vectorDrawables.useSupportLibrary = true
     }
     buildTypes {
         release {
@@ -26,15 +28,22 @@ android {
 ext {
     supportLibraryVersion = '25.3.1'
     firebaseVersion = '10.2.4'
+    googlePlayServicesVersion = '10.2.4'
 }
 
 dependencies {
     compile "com.android.support:appcompat-v7:$supportLibraryVersion"
     compile "com.android.support:cardview-v7:$supportLibraryVersion"
+    compile "com.android.support:design:$supportLibraryVersion"
+
     compile "com.google.firebase:firebase-messaging:$firebaseVersion"
+    compile 'com.parse.bolts:bolts-tasks:1.4.0'
     compile 'com.squareup.okhttp3:okhttp:3.7.0'
     compile 'com.facebook.stetho:stetho:1.5.0'
     compile 'com.facebook.stetho:stetho-okhttp3:1.5.0'
+
+    compile "com.google.android.gms:play-services-maps:$googlePlayServicesVersion"
+    compile "com.google.android.gms:play-services-location:$googlePlayServicesVersion"
 }
 
 apply plugin: 'com.google.gms.google-services'

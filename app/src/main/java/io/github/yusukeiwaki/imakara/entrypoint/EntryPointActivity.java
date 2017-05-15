@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.text.TextUtils;
 
 import io.github.yusukeiwaki.imakara.etc.CurrentUserCache;
+import io.github.yusukeiwaki.imakara.fcm.FcmRegistrationService;
 import io.github.yusukeiwaki.imakara.sender.SenderActivity;
 import io.github.yusukeiwaki.imakara.setup.SetupActivity;
 
@@ -13,6 +14,8 @@ public class EntryPointActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        startService(FcmRegistrationService.newIntent(this));
+
         launchProperActivity();
         finish();
     }
