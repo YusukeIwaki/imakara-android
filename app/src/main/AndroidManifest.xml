@@ -27,6 +27,8 @@
         <activity android:name=".sender.SenderActivity"/>
         <activity android:name=".sender.PositioningRequirementCheckAndStartPositioningActivity" android:theme="@style/AppTheme.Translucent.NoTitleBar"/>
         <service android:name=".sender.PositioningService"/>
+        <service android:name=".sender.PositioningRequestReceiverNotificationService"/>
+        <service android:name=".sender.PositioningReceiverStopService"/>
 
         <activity android:name=".requester.RequesterActivity"/>
 

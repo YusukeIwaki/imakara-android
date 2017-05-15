@@ -42,6 +42,7 @@ public class PositioningRequirementCheckAndStartPositioningActivity extends AppC
     };
     private GoogleApiClient.OnConnectionFailedListener googleApiClientFailureListener = connectionResult -> {
         Toast.makeText(this, R.string.requirement_check_failure_googleplay, Toast.LENGTH_SHORT).show();
+        PositioningRequestReceiverNotificationService.stop(this);
         finish();
     };
 
@@ -116,6 +117,7 @@ public class PositioningRequirementCheckAndStartPositioningActivity extends AppC
                                 status.startResolutionForResult(this, RC_LOCATION_SETTING);
                             } catch (IntentSender.SendIntentException e) {
                                 Toast.makeText(this, R.string.requirement_check_failure_location_setting, Toast.LENGTH_SHORT).show();
+                                PositioningRequestReceiverNotificationService.stop(this);
                                 finish();
                             }
                             break;
@@ -124,6 +126,7 @@ public class PositioningRequirementCheckAndStartPositioningActivity extends AppC
                             // Location settings are not satisfied. However, we have no way
                             // to fix the settings so we won't show the dialog.
                             Toast.makeText(this, R.string.requirement_check_failure_location_setting, Toast.LENGTH_SHORT).show();
+                            PositioningRequestReceiverNotificationService.stop(this);
                             finish();
                             break;
                     }
@@ -151,6 +154,7 @@ public class PositioningRequirementCheckAndStartPositioningActivity extends AppC
         }
 
         Toast.makeText(this, R.string.requirement_check_failure_location_permission, Toast.LENGTH_SHORT).show();
+        PositioningRequestReceiverNotificationService.stop(this);
         finish();
     }
 
@@ -167,6 +171,7 @@ public class PositioningRequirementCheckAndStartPositioningActivity extends AppC
         }
 
         Toast.makeText(this, R.string.requirement_check_failure_location_setting, Toast.LENGTH_SHORT).show();
+        PositioningRequestReceiverNotificationService.stop(this);
         finish();
     }
 }

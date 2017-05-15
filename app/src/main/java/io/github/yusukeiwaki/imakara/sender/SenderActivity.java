@@ -16,6 +16,7 @@ import io.github.yusukeiwaki.imakara.etc.ReactiveSharedPref;
 
 public class SenderActivity extends BaseActivity {
     private ReactiveSharedPref<LocationCacheItem> reactiveSharedPref;
+    private PositioningReceiverBindingManager bindingManager;
 
     public static Intent newIntent(Context context) {
         return new Intent(context, SenderActivity.class);
@@ -31,9 +32,13 @@ public class SenderActivity extends BaseActivity {
         }
 
         findViewById(R.id.btn_start).setOnClickListener(v -> {
+            bindingManager.start();
+            PositioningRequestReceiverNotificationService.start(this);
             startPositioning();
         });
-        setFabState(false);
+        findViewById(R.id.btn_stop).setOnClickListener(v -> {
+            PositioningRequestReceiverNotificationService.stop(this);
+        });
 
         reactiveSharedPref = new ReactiveSharedPref<>(LocationLogCache.get(this), new ReactiveSharedPref.ObservationPolicy<LocationCacheItem>() {
             @Override
@@ -70,6 +75,17 @@ public class SenderActivity extends BaseActivity {
             TextView text = findViewById2(R.id.debug_text);
             text.setText(locationCacheItem.toString());
         });
+
+        bindingManager = new PositioningReceiverBindingManager(this);
+        bindingManager.setOnStateChangedListener(activated -> {
+            setFabState(activated);
+        });
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        bindingManager.start();
     }
 
     @Override
@@ -82,6 +98,12 @@ public class SenderActivity extends BaseActivity {
     protected void onPause() {
         reactiveSharedPref.unsub();
         super.onPause();
+    }
+
+    @Override
+    protected void onStop() {
+        bindingManager.stop();
+        super.onStop();
     }
 
     private void startPositioning() {
@@ -100,18 +122,16 @@ public class SenderActivity extends BaseActivity {
     private void setFabVisibility(FloatingActionButton fab, boolean show) {
         if (show) {
             if (fab.getVisibility() == View.VISIBLE) return;
-
+            fab.setScaleX(0.0f);
+            fab.setScaleY(0.0f);
             fab.setVisibility(View.VISIBLE);
-            fab.show();
+            fab.animate()
+                    .scaleX(1.0f)
+                    .scaleY(1.0f)
+                    .start();
         } else {
             if (fab.getVisibility() == View.GONE) return;
-
-            fab.hide(new FloatingActionButton.OnVisibilityChangedListener() {
-                @Override
-                public void onHidden(FloatingActionButton fab) {
-                    fab.setVisibility(View.GONE);
-                }
-            });
+            fab.setVisibility(View.GONE);
         }
     }
 }

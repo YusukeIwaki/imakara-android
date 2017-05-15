@@ -7,6 +7,10 @@
     <!-- 以下、文脈ごとの定義 -->
     <string name="setup_title_username">表示名</string>
 
+    <string name="request_receiver_notification_title">待受中</string>
+    <string name="request_receiver_notification_action_update_location_manually">手動更新</string>
+    <string name="request_receiver_notification_action_stop">中止</string>
+
     <string name="requirement_check_failure_googleplay">Google Playサービスに接続できません</string>
     <string name="requirement_check_failure_location_setting">位置情報の設定が有効になっていません</string>
     <string name="requirement_check_failure_location_permission">パーミッションを許可しないとこのアプリは使えません</string>
