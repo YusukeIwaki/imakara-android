@@ -73,6 +73,7 @@ public class PositioningService extends Service {
     @Override
     public void onDestroy() {
         serviceThreadLooper.quit();
+        positioningThreadLooper.quit();
         super.onDestroy();
     }
 
@@ -89,10 +90,12 @@ public class PositioningService extends Service {
         ConnectionResult connectionResult = googleApiClient.blockingConnect();
         if (!connectionResult.isSuccess()) {
             Log.e(TAG, String.format("onConnectionFailed: [%d] %s", connectionResult.getErrorCode(), connectionResult.getErrorMessage()));
+            stopSelf();
             return;
         }
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            stopSelf();
             return;
         }
 
