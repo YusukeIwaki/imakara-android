@@ -48,27 +48,12 @@ public class SenderActivity extends BaseActivity {
 
             @Override
             public LocationCacheItem getValueFromSharedPreference(SharedPreferences prefs) {
-                return new LocationCacheItem() {
-                    @Override
-                    public float lat() {
-                        return prefs.getFloat(LocationLogCache.KEY_LATITUDE, 0);
-                    }
-
-                    @Override
-                    public float lon() {
-                        return prefs.getFloat(LocationLogCache.KEY_LONGITUDE, 0);
-                    }
-
-                    @Override
-                    public float accuracy() {
-                        return prefs.getFloat(LocationLogCache.KEY_ACCURACY, 0);
-                    }
-
-                    @Override
-                    public long timestamp() {
-                        return prefs.getLong(LocationLogCache.KEY_LAST_UPDATED_AT, 0);
-                    }
-                };
+                return new LocationCacheItem.Builder()
+                        .lat(prefs.getFloat(LocationLogCache.KEY_LATITUDE, 0))
+                        .lon(prefs.getFloat(LocationLogCache.KEY_LONGITUDE, 0))
+                        .accuracy(prefs.getFloat(LocationLogCache.KEY_ACCURACY, 0))
+                        .timestamp(prefs.getLong(LocationLogCache.KEY_LAST_UPDATED_AT, 0))
+                        .build();
             }
         });
         reactiveSharedPref.setOnUpdateListener(locationCacheItem -> {
