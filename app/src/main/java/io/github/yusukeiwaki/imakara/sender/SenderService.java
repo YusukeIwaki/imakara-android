@@ -13,7 +13,7 @@ import android.support.v4.app.NotificationCompat;
 
 import io.github.yusukeiwaki.imakara.R;
 
-public class PositioningRequestReceiverNotificationService extends Service {
+public class SenderService extends Service {
 
     private static final int NOTIFICATION_ID = 12;
     private static final int RC_POSITIONING_MANUALLY = 13;
@@ -22,7 +22,7 @@ public class PositioningRequestReceiverNotificationService extends Service {
     private static final String KEY_START = "start";
 
     public static Intent newIntent(Context context, boolean start) {
-        Intent intent = new Intent(context, PositioningRequestReceiverNotificationService.class);
+        Intent intent = new Intent(context, SenderService.class);
         intent.putExtra(KEY_START, start);
         return intent;
     }
@@ -68,7 +68,7 @@ public class PositioningRequestReceiverNotificationService extends Service {
     }
 
     private PendingIntent buildPendingIntentForStopService() {
-        return PendingIntent.getService(this, RC_STOP_SERVICE, PositioningReceiverStopService.newIntent(this) ,0);
+        return PendingIntent.getService(this, RC_STOP_SERVICE, SenderCancelService.newIntent(this) ,0);
     }
 
     @Nullable

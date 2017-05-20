@@ -5,7 +5,7 @@ import android.content.Context;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 
-public class PositioningReceiverBindingManager {
+public class SenderServiceBindingManager {
     private final Context context;
     private boolean serviceIsBound;
 
@@ -18,7 +18,7 @@ public class PositioningReceiverBindingManager {
         this.onStateChangedListener = onStateChangedListener;
     }
 
-    public PositioningReceiverBindingManager(Context context) {
+    public SenderServiceBindingManager(Context context) {
         this.context = context;
 
         serviceIsBound = false;
@@ -27,7 +27,7 @@ public class PositioningReceiverBindingManager {
     public void start() {
         if (onStateChangedListener != null) onStateChangedListener.onPositioningReceiverStateChanged(serviceIsBound);
         if (!serviceIsBound) {
-            context.bindService(PositioningRequestReceiverNotificationService.newIntent(context, true), connection, 0);
+            context.bindService(SenderService.newIntent(context, true), connection, 0);
         }
     }
 

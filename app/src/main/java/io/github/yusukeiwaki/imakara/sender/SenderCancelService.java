@@ -5,19 +5,22 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.Nullable;
 
-public class PositioningReceiverStopService extends IntentService {
-    private static final String TAG = PositioningReceiverStopService.class.getSimpleName();
+/**
+ * {@link SenderService} を止めるサービス
+ */
+public class SenderCancelService extends IntentService {
+    private static final String TAG = SenderCancelService.class.getSimpleName();
 
     public static Intent newIntent(Context context) {
-        return new Intent(context, PositioningReceiverStopService.class);
+        return new Intent(context, SenderCancelService.class);
     }
 
-    public PositioningReceiverStopService() {
+    public SenderCancelService() {
         super(TAG);
     }
 
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
-        PositioningRequestReceiverNotificationService.stop(this);
+        SenderService.stop(this);
     }
 }

@@ -28,8 +28,8 @@
         <service android:name=".sender.TrackingIdUpdateService"/>
         <activity android:name=".sender.PositioningRequirementCheckAndStartPositioningActivity" android:theme="@style/AppTheme.Translucent.NoTitleBar"/>
         <service android:name=".sender.PositioningService"/>
-        <service android:name=".sender.PositioningRequestReceiverNotificationService"/>
-        <service android:name=".sender.PositioningReceiverStopService"/>
+        <service android:name=".sender.SenderService"/>
+        <service android:name=".sender.SenderCancelService"/>
 
         <activity android:name=".requester.RequesterActivity"/>
 

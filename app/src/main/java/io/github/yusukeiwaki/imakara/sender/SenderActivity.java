@@ -16,7 +16,7 @@ import io.github.yusukeiwaki.imakara.etc.ReactiveSharedPref;
 
 public class SenderActivity extends BaseActivity {
     private ReactiveSharedPref<LocationCacheItem> reactiveSharedPref;
-    private PositioningReceiverBindingManager bindingManager;
+    private SenderServiceBindingManager bindingManager;
 
     public static Intent newIntent(Context context) {
         return new Intent(context, SenderActivity.class);
@@ -33,11 +33,11 @@ public class SenderActivity extends BaseActivity {
 
         findViewById(R.id.btn_start).setOnClickListener(v -> {
             bindingManager.start();
-            PositioningRequestReceiverNotificationService.start(this);
+            SenderService.start(this);
             startPositioning();
         });
         findViewById(R.id.btn_stop).setOnClickListener(v -> {
-            PositioningRequestReceiverNotificationService.stop(this);
+            SenderService.stop(this);
         });
 
         reactiveSharedPref = new ReactiveSharedPref<>(LocationLogCache.get(this), new ReactiveSharedPref.ObservationPolicy<LocationCacheItem>() {
@@ -61,7 +61,7 @@ public class SenderActivity extends BaseActivity {
             text.setText(locationCacheItem.toString());
         });
 
-        bindingManager = new PositioningReceiverBindingManager(this);
+        bindingManager = new SenderServiceBindingManager(this);
         bindingManager.setOnStateChangedListener(activated -> {
             setFabState(activated);
         });
