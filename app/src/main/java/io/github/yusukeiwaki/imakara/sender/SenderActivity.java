@@ -2,7 +2,6 @@ package io.github.yusukeiwaki.imakara.sender;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -11,11 +10,9 @@ import android.widget.TextView;
 
 import io.github.yusukeiwaki.imakara.R;
 import io.github.yusukeiwaki.imakara.base.BaseActivity;
-import io.github.yusukeiwaki.imakara.etc.LocationLogCache;
-import io.github.yusukeiwaki.imakara.etc.ReactiveSharedPref;
 
 public class SenderActivity extends BaseActivity {
-    private ReactiveSharedPref<LocationCacheItem> reactiveSharedPref;
+    private LocationCacheObserver locationCacheObserver;
     private SenderServiceBindingManager bindingManager;
 
     public static Intent newIntent(Context context) {
@@ -40,23 +37,8 @@ public class SenderActivity extends BaseActivity {
             SenderService.stop(this);
         });
 
-        reactiveSharedPref = new ReactiveSharedPref<>(LocationLogCache.get(this), new ReactiveSharedPref.ObservationPolicy<LocationCacheItem>() {
-            @Override
-            public boolean isTargetKey(String key) {
-                return true;
-            }
-
-            @Override
-            public LocationCacheItem getValueFromSharedPreference(SharedPreferences prefs) {
-                return new LocationCacheItem.Builder()
-                        .lat(prefs.getFloat(LocationLogCache.KEY_LATITUDE, 0))
-                        .lon(prefs.getFloat(LocationLogCache.KEY_LONGITUDE, 0))
-                        .accuracy(prefs.getFloat(LocationLogCache.KEY_ACCURACY, 0))
-                        .timestamp(prefs.getLong(LocationLogCache.KEY_LAST_UPDATED_AT, 0))
-                        .build();
-            }
-        });
-        reactiveSharedPref.setOnUpdateListener(locationCacheItem -> {
+        locationCacheObserver = new LocationCacheObserver(this);
+        locationCacheObserver.setOnUpdateListener(locationCacheItem -> {
             TextView text = findViewById2(R.id.debug_text);
             text.setText(locationCacheItem.toString());
         });
@@ -76,12 +58,12 @@ public class SenderActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        reactiveSharedPref.sub();
+        locationCacheObserver.sub();
     }
 
     @Override
     protected void onPause() {
-        reactiveSharedPref.unsub();
+        locationCacheObserver.unsub();
         super.onPause();
     }
 
