@@ -174,4 +174,10 @@ public class PositioningRequirementCheckAndStartPositioningActivity extends AppC
         SenderService.stop(this);
         finish();
     }
+
+    @Override
+    public void finish() {
+        super.finish();
+        overridePendingTransition(0, 0);
+    }
 }
