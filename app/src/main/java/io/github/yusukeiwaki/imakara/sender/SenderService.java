@@ -8,8 +8,8 @@ import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.ContextCompat;
 
 import io.github.yusukeiwaki.imakara.R;
 
@@ -27,6 +27,9 @@ public class SenderService extends Service {
         return intent;
     }
 
+    private PositioningRequestReceiver positioningRequestReceiver;
+    private LocationUpdater locationUpdater;
+
     public static void start(Context context) {
         context.startService(newIntent(context, true));
     }
@@ -39,6 +42,11 @@ public class SenderService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        positioningRequestReceiver = new PositioningRequestReceiver();
+        registerReceiver(positioningRequestReceiver, PositioningRequestReceiver.newIntentFilter());
+
+        locationUpdater = new LocationUpdater(this);
+        locationUpdater.enable();
     }
 
     @Override
@@ -51,6 +59,13 @@ public class SenderService extends Service {
             stopSelf();
         }
         return START_STICKY;
+    }
+
+    @Override
+    public void onDestroy() {
+        locationUpdater.disable();
+        unregisterReceiver(positioningRequestReceiver);
+        super.onDestroy();
     }
 
     private Notification buildNotification() {

@@ -1,9 +1,14 @@
 package io.github.yusukeiwaki.imakara.etc;
 
 import android.content.SharedPreferences;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 
 public class ReactiveSharedPref<T> {
     private final SharedPreferences prefs;
+    private Handler handler;
+    private static final int DEBOUNCE_MS = 300;
 
     public interface ObservationPolicy<T> {
         boolean isTargetKey(String key);
@@ -21,23 +26,40 @@ public class ReactiveSharedPref<T> {
     public ReactiveSharedPref(SharedPreferences prefs, ObservationPolicy<T> observationPolicy) {
         this.prefs = prefs;
         this.observationPolicy = observationPolicy;
+
+        this.handler = new Handler(Looper.myLooper()) {
+            @Override
+            public void handleMessage(Message msg) {
+                if (onUpdateListener != null) {
+                    onUpdateListener.onPreferenceValueUpdated((T) msg.obj);
+                }
+            }
+        };
     }
 
     public void setOnUpdateListener(OnUpdateListener<T> onUpdateListener) {
         this.onUpdateListener = onUpdateListener;
     }
 
+    private void scheduleNotifyPreferenceValueUpdated(T value) {
+        unscheduleNotifyPreferenceValueUpdated();
+        handler.sendMessageDelayed(handler.obtainMessage(0, value), DEBOUNCE_MS);
+    }
+
+    private void unscheduleNotifyPreferenceValueUpdated() {
+        handler.removeMessages(0);
+    }
+
     public void sub() {
         prevValue = observationPolicy.getValueFromSharedPreference(prefs);
-        if (onUpdateListener != null) {
-            onUpdateListener.onPreferenceValueUpdated(prevValue);
-        }
+        scheduleNotifyPreferenceValueUpdated(prevValue);
 
         prefs.registerOnSharedPreferenceChangeListener(listener);
     }
 
     public void unsub() {
         prefs.unregisterOnSharedPreferenceChangeListener(listener);
+        unscheduleNotifyPreferenceValueUpdated();
     }
 
     private final SharedPreferences.OnSharedPreferenceChangeListener listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
@@ -49,10 +71,11 @@ public class ReactiveSharedPref<T> {
             if (prevValue == null) {
                 if (newValue == null) return;
 
-                onUpdateListener.onPreferenceValueUpdated(newValue);
-            } else if (prevValue.equals(newValue)) {
-                onUpdateListener.onPreferenceValueUpdated(newValue);
+                scheduleNotifyPreferenceValueUpdated(newValue);
+            } else if (!prevValue.equals(newValue)) {
+                scheduleNotifyPreferenceValueUpdated(newValue);
             }
+            prevValue = newValue;
         }
     };
 }

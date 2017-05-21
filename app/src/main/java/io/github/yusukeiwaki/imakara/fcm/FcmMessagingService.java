@@ -5,26 +5,27 @@ import android.util.Log;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.Map;
+
 public class FcmMessagingService extends FirebaseMessagingService {
     private static final String TAG = FcmMessagingService.class.getSimpleName();
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
-        // TODO(developer): Handle FCM messages here.
-        // Not getting messages here? See why this may be: https://goo.gl/39bRNJ
-        Log.d(TAG, "From: " + remoteMessage.getFrom());
+        final Map<String, String> data = remoteMessage.getData();
 
-        // Check if message contains a data payload.
-        if (remoteMessage.getData().size() > 0) {
-            Log.d(TAG, "Message data payload: " + remoteMessage.getData());
+        try {
+            PushData pushData = new PushData.Builder()
+                    .pushType(data.get("push_type"))
+                    .tracking(new JSONObject(data.get("tracking")))
+                    .build();
+
+            new PushDataHandler(this, pushData).handle();
+        } catch (JSONException e) {
+            Log.e(TAG, e.getMessage(), e);
         }
-
-        // Check if message contains a notification payload.
-        if (remoteMessage.getNotification() != null) {
-            Log.d(TAG, "Message Notification Body: " + remoteMessage.getNotification().getBody());
-        }
-
-        // Also if you intend on generating your own notifications as a result of a received FCM
-        // message, here is where that should be initiated. See sendNotification method below.
     }
 }
