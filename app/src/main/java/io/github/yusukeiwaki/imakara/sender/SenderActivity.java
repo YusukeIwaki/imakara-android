@@ -1,19 +1,23 @@
 package io.github.yusukeiwaki.imakara.sender;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import io.github.yusukeiwaki.imakara.R;
 import io.github.yusukeiwaki.imakara.base.BaseActivity;
 
 public class SenderActivity extends BaseActivity {
-    private LocationCacheObserver locationCacheObserver;
     private SenderServiceBindingManager bindingManager;
+    private ShortUrlObserver shortUrlObserver;
 
     public static Intent newIntent(Context context) {
         return new Intent(context, SenderActivity.class);
@@ -37,38 +41,49 @@ public class SenderActivity extends BaseActivity {
             SenderService.stop(this);
         });
 
-        locationCacheObserver = new LocationCacheObserver(this);
-        locationCacheObserver.setOnUpdateListener(locationCacheItem -> {
-            TextView text = findViewById2(R.id.debug_text);
-            text.setText(locationCacheItem.toString());
-        });
-
         bindingManager = new SenderServiceBindingManager(this);
         bindingManager.setOnStateChangedListener(activated -> {
             setFabState(activated);
+            setIntroductionVisibility(activated);
         });
+
+        shortUrlObserver = new ShortUrlObserver(this);
+        shortUrlObserver.setOnUpdateListener(shortUrl -> {
+            TextView urlText = findViewById2(R.id.url_text);
+            urlText.setText(TextUtils.isEmpty(shortUrl) ? "" : shortUrl);
+        });
+
+        findViewById(R.id.btn_copy_to_clipboard).setOnClickListener(v -> {
+            TextView urlText = findViewById2(R.id.url_text);
+
+            ClipboardManager clipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+            clipboardManager.setPrimaryClip(ClipData.newPlainText(null, urlText.getText()));
+            Toast.makeText(v.getContext(), R.string.sender_caption_copied_to_clipboard, Toast.LENGTH_SHORT).show();
+        });
+
+        findViewById(R.id.btn_share).setOnClickListener(v -> {
+            TextView urlText = findViewById2(R.id.url_text);
+
+            Intent intent = new Intent(Intent.ACTION_SEND);
+            intent.setType("text/plain");
+            intent.putExtra(Intent.EXTRA_TEXT, urlText.getText().toString());
+
+            Intent chooserIntent = Intent.createChooser(intent, getString(R.string.share));
+            startActivity(chooserIntent);
+        });
+
     }
 
     @Override
     protected void onStart() {
         super.onStart();
         bindingManager.start();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        locationCacheObserver.sub();
-    }
-
-    @Override
-    protected void onPause() {
-        locationCacheObserver.unsub();
-        super.onPause();
+        shortUrlObserver.sub();
     }
 
     @Override
     protected void onStop() {
+        shortUrlObserver.unsub();
         bindingManager.stop();
         super.onStop();
     }
@@ -99,6 +114,19 @@ public class SenderActivity extends BaseActivity {
         } else {
             if (fab.getVisibility() == View.GONE) return;
             fab.setVisibility(View.GONE);
+        }
+    }
+
+    private void setIntroductionVisibility(boolean isActivated) {
+        View introForStart = findViewById(R.id.introduction_inactive);
+        View introForStop = findViewById(R.id.introduction_activated);
+
+        if (isActivated) {
+            introForStart.setVisibility(View.GONE);
+            introForStop.setVisibility(View.VISIBLE);
+        } else {
+            introForStart.setVisibility(View.VISIBLE);
+            introForStop.setVisibility(View.GONE);
         }
     }
 }

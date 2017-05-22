@@ -2,6 +2,8 @@
     <string name="app_name">imakara</string>
 
     <!-- 単語(文脈の不要な、ボタンやダイアログのキャプションなど) -->
+    <string name="copy_to_clipboard">クリップボードにコピー</string>
+    <string name="share">共有</string>
 
 
     <!-- 以下、文脈ごとの定義 -->
@@ -14,4 +16,11 @@
     <string name="requirement_check_failure_googleplay">Google Playサービスに接続できません</string>
     <string name="requirement_check_failure_location_setting">位置情報の設定が有効になっていません</string>
     <string name="requirement_check_failure_location_permission">パーミッションを許可しないとこのアプリは使えません</string>
+
+    <string name="sender_lets_create_url_to_share">スマホの位置をあらわす\nURLを作成しましょう</string>
+    <string name="sender_caption_about_notification">↑通知アイコンが表示されている間だけ、URLにアクセスされたときにスマホの位置を返します。\n「手動更新」すると、URLを見ているユーザにスマホの位置をプッシュで知らせることができます。</string>
+
+    <string name="sender_caption_url">このスマホの位置をあらわすURL</string>
+    <string name="sender_caption_copied_to_clipboard">クリップボードにコピーされました</string>
+
 </resources>

@@ -5,52 +5,18 @@ import android.util.Log;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
-
 import bolts.Task;
-import bolts.TaskCompletionSource;
 import io.github.yusukeiwaki.imakara.ImakaraApplication;
-import io.github.yusukeiwaki.imakara.etc.OkHttpHelper;
-import okhttp3.Call;
-import okhttp3.Callback;
 import okhttp3.HttpUrl;
 import okhttp3.MediaType;
 import okhttp3.Request;
 import okhttp3.RequestBody;
-import okhttp3.Response;
 
-public class ImakaraAPI {
+public class ImakaraAPI extends APIBase {
     private static final String TAG = ImakaraAPI.class.getSimpleName();
 
     private String getHostname() {
         return ImakaraApplication.ENV.API_HOSTNAME;
-    }
-
-    private Task<Response> baseRequest(Request request) {
-        TaskCompletionSource<Response> tcs = new TaskCompletionSource<>();
-        OkHttpHelper.getHttpClient().newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                tcs.setError(e);
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                if (response.isSuccessful()) {
-                    tcs.setResult(response);
-                } else {
-                    tcs.setError(new HttpError(response.code(), response.body().string()));
-                }
-            }
-        });
-        return tcs.getTask();
-    }
-
-    private Task<JSONObject> baseJsonRequest(Request request) {
-        return baseRequest(request).onSuccess(task -> {
-            Response response = task.getResult();
-            return new JSONObject(response.body().string());
-        });
     }
 
     public Task<JSONObject> createOrUpdateTracking(String username, String fcmToken) {
@@ -79,16 +45,22 @@ public class ImakaraAPI {
         return baseJsonRequest(req);
     }
 
-    public Task<JSONObject> getTracking(String trackingId) {
-        HttpUrl url = new HttpUrl.Builder()
+    private HttpUrl buildTrackingUrl(String trackingId) {
+        return new HttpUrl.Builder()
                 .scheme("https")
                 .host(getHostname())
                 .addPathSegment("trackings")
                 .addPathSegment(trackingId)
                 .build();
+    }
 
+    public String getTrackingURL(String trackingId) {
+        return buildTrackingUrl(trackingId).toString();
+    }
+
+    public Task<JSONObject> getTracking(String trackingId) {
         Request req = new Request.Builder()
-                .url(url)
+                .url(buildTrackingUrl(trackingId))
                 .build();
 
         return baseJsonRequest(req);

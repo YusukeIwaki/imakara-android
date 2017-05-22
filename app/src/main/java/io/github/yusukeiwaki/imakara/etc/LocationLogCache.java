@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 public class LocationLogCache {
     private static final String PREF_NAME = "location_log";
     public static final String KEY_TRACKING_ID = "tracking_id";
+    public static final String KEY_SHORT_URL = "short_url";
     public static final String KEY_TRACKING_STARTED_AT = "tracking_started_at";
     public static final String KEY_LATITUDE = "lat";
     public static final String KEY_LONGITUDE = "lon";

@@ -12,6 +12,8 @@ import org.json.JSONObject;
 
 import java.util.concurrent.TimeUnit;
 
+import bolts.Task;
+import io.github.yusukeiwaki.imakara.api.GoogleAPI;
 import io.github.yusukeiwaki.imakara.api.ImakaraAPI;
 import io.github.yusukeiwaki.imakara.etc.CurrentUserCache;
 import io.github.yusukeiwaki.imakara.etc.LocationLogCache;
@@ -19,6 +21,8 @@ import io.github.yusukeiwaki.imakara.etc.LocationLogCache;
 public class TrackingIdUpdateService extends IntentService {
     private static final String TAG = TrackingIdUpdateService.class.getSimpleName();
     private static final int API_TIMEOUT_MS = 4500;
+    private final ImakaraAPI imakaraAPI;
+    private final GoogleAPI googleAPI;
 
     public static void start(Context context) {
         Intent intent = new Intent(context, TrackingIdUpdateService.class);
@@ -27,6 +31,8 @@ public class TrackingIdUpdateService extends IntentService {
 
     public TrackingIdUpdateService() {
         super(TAG);
+        imakaraAPI = new ImakaraAPI();
+        googleAPI = new GoogleAPI();
     }
 
     @Override
@@ -41,16 +47,36 @@ public class TrackingIdUpdateService extends IntentService {
 
     private void getTrackingIdFromAPI(String username, String gcmToken) {
         try {
-            new ImakaraAPI().createOrUpdateTracking(username, gcmToken).onSuccess(task -> {
+            imakaraAPI.createOrUpdateTracking(username, gcmToken).onSuccessTask(task -> {
                 JSONObject response = task.getResult();
                 String trackingId = response.getString("id");
-                LocationLogCache.get(this).edit()
-                        .putString(LocationLogCache.KEY_TRACKING_ID, trackingId)
-                        .apply();
-                return null;
+
+                String origTrackingId = LocationLogCache.get(this).getString(LocationLogCache.KEY_TRACKING_ID, trackingId);
+                if (!origTrackingId.equals(trackingId)) {
+                    LocationLogCache.get(this).edit()
+                            .putString(LocationLogCache.KEY_TRACKING_ID, trackingId)
+                            .apply();
+
+                    return getShortUrl(trackingId);
+                }
+
+                return Task.forResult(null);
             }).waitForCompletion(API_TIMEOUT_MS, TimeUnit.MILLISECONDS); //IntentServiceなので、ブロックしておかないとstopSelfされてしまう
         } catch (InterruptedException e) {
             Log.e(TAG, e.getMessage(), e);
         }
+    }
+
+    private Task<Void> getShortUrl(String trackingId) {
+        String trackingUrl = imakaraAPI.getTrackingURL(trackingId);
+        return googleAPI.shortenUrl(trackingUrl).onSuccess(task -> {
+            String shortUrl = task.getResult();
+
+            LocationLogCache.get(this).edit()
+                    .putString(LocationLogCache.KEY_SHORT_URL, shortUrl)
+                    .apply();
+
+            return null;
+        });
     }
 }
