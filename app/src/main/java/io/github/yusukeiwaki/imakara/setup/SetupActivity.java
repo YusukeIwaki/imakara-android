@@ -41,12 +41,20 @@ public class SetupActivity extends BaseActivity {
                 btnProceed.setEnabled(s.length() >= 4);
             }
         });
+        editorUsername.setOnEditorActionListener((v, actionId, event) -> {
+            proceed(editorUsername.getText().toString());
+            return true;
+        });
 
         btnProceed.setOnClickListener(v -> {
-            CurrentUserCache.get(this).edit()
-                    .putString(CurrentUserCache.KEY_USERNAME, editorUsername.getText().toString())
-                    .apply();
+            proceed(editorUsername.getText().toString());
         });
+    }
+
+    private void proceed(String username) {
+        CurrentUserCache.get(this).edit()
+                .putString(CurrentUserCache.KEY_USERNAME, username)
+                .apply();
     }
 
     private void handleIntent() {
