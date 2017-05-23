@@ -55,7 +55,7 @@ public class ImakaraAPI extends APIBase {
     }
 
     public String getTrackingURLForShare(String trackingId) {
-        return buildTrackingUrl(trackingId).toString() + ".png";
+        return buildTrackingUrl(trackingId).toString() + "/location.png";
     }
 
     public Task<JSONObject> getTracking(String trackingId) {

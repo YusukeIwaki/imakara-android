@@ -45,7 +45,7 @@ public class EntryPointActivity extends Activity {
         }
 
         if (uri != null) {
-            Matcher m = Pattern.compile(String.format("^https://%s/trackings/([^/]+)\\.png", ImakaraApplication.ENV.API_HOSTNAME))
+            Matcher m = Pattern.compile(String.format("^https://%s/trackings/([^/]+)/location\\.png", ImakaraApplication.ENV.API_HOSTNAME))
                     .matcher(uri.toString());
             if (m.find()) {
                 String trackingId = m.group(1);
