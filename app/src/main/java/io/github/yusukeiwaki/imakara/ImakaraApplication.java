@@ -7,6 +7,8 @@ import android.content.res.Resources;
 import com.facebook.stetho.Stetho;
 
 import io.github.yusukeiwaki.imakara.etc.OkHttpHelper;
+import io.realm.Realm;
+import io.realm.RealmConfiguration;
 
 public class ImakaraApplication extends Application {
     public static class ENV {
@@ -28,5 +30,10 @@ public class ImakaraApplication extends Application {
         ENV.initializeWith(this);
         OkHttpHelper.initializeHttpClient();
         Stetho.initializeWithDefaults(this);
+
+        Realm.init(this);
+        Realm.setDefaultConfiguration(new RealmConfiguration.Builder()
+                .deleteRealmIfMigrationNeeded()
+                .build());
     }
 }

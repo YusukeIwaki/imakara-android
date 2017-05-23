@@ -6,6 +6,8 @@ import android.util.Log;
 import org.json.JSONException;
 
 import io.github.yusukeiwaki.imakara.etc.LocationLogCache;
+import io.github.yusukeiwaki.imakara.etc.realm.RealmHelper;
+import io.github.yusukeiwaki.imakara.model.Tracking;
 import io.github.yusukeiwaki.imakara.sender.PositioningRequestReceiver;
 
 public class PushDataHandler {
@@ -36,7 +38,10 @@ public class PushDataHandler {
             }
         }
         else if (PushData.TYPE_NEW_LOCATION_LOG.equals(pushData.pushType())) {
-
+            RealmHelper.executeTransaction(realm -> {
+                realm.createOrUpdateObjectFromJson(Tracking.class, pushData.tracking());
+                return null;
+            });
         }
     }
 }
