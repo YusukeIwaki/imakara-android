@@ -31,7 +31,16 @@
         <service android:name=".sender.SenderCancelService"/>
 
         <activity android:name=".requester.RequesterActivity"/>
-
+        <activity-alias
+            android:name=".TrackingViewActivity"
+            android:targetActivity=".entrypoint.EntryPointActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" android:host="@string/api_hostname" android:pathPattern="/trackings/.*\\.png"/>
+            </intent-filter>
+        </activity-alias>
 
         <!-- Set custom default icon. This is used when no icon is set for incoming notification messages. See README(https://goo.gl/l4GJaQ) for more. -->
         <meta-data

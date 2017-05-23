@@ -17,14 +17,20 @@ import io.github.yusukeiwaki.imakara.etc.SimpleTextWatcher;
 import io.github.yusukeiwaki.imakara.sender.SenderActivity;
 
 public class SetupActivity extends BaseActivity {
-    public static Intent newIntent(Context context) {
-        return new Intent(context, SetupActivity.class);
+    public static Intent newIntent(Context context, Intent nextIntent) {
+        Intent intent = new Intent(context, SetupActivity.class);
+        intent.putExtra(Intent.EXTRA_INTENT, nextIntent);
+        return intent;
     }
+
+    private Intent nextIntent;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setup);
+
+        handleIntent();
 
         final EditText editorUsername = findViewById2(R.id.editor_username);
         final Button btnProceed = findViewById2(R.id.btn_proceed);
@@ -43,11 +49,23 @@ public class SetupActivity extends BaseActivity {
         });
     }
 
+    private void handleIntent() {
+        Intent intent = getIntent();
+        if (intent != null) {
+            Intent nextIntent = intent.getParcelableExtra(Intent.EXTRA_INTENT);
+            if (nextIntent != null) {
+                this.nextIntent = nextIntent;
+                return;
+            }
+        }
+        this.nextIntent = SenderActivity.newIntent(this);
+    }
+
     private SharedPreferences.OnSharedPreferenceChangeListener usernameListener = (prefs, key) -> {
         if (CurrentUserCache.KEY_USERNAME.equals(key)) {
             String username = prefs.getString(CurrentUserCache.KEY_USERNAME, null);
             if (!TextUtils.isEmpty(username)) {
-                proceed();
+                startActivity(nextIntent);
                 finish();
             }
         }
@@ -65,10 +83,5 @@ public class SetupActivity extends BaseActivity {
         CurrentUserCache.get(this).unregisterOnSharedPreferenceChangeListener(usernameListener);
 
         super.onPause();
-    }
-
-    private void proceed() {
-        Intent intent = SenderActivity.newIntent(this);
-        startActivity(intent);
     }
 }
