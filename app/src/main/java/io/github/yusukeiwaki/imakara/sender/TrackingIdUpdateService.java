@@ -51,8 +51,8 @@ public class TrackingIdUpdateService extends IntentService {
                 JSONObject response = task.getResult();
                 String trackingId = response.getString("id");
 
-                String origTrackingId = LocationLogCache.get(this).getString(LocationLogCache.KEY_TRACKING_ID, trackingId);
-                if (!origTrackingId.equals(trackingId)) {
+                String origTrackingId = LocationLogCache.get(this).getString(LocationLogCache.KEY_TRACKING_ID, null);
+                if (TextUtils.isEmpty(origTrackingId) || !origTrackingId.equals(trackingId)) {
                     LocationLogCache.get(this).edit()
                             .putString(LocationLogCache.KEY_TRACKING_ID, trackingId)
                             .apply();
