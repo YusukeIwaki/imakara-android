@@ -23,7 +23,7 @@ public class ShortUrlObserver extends ReactiveSharedPref<String> {
                 if (!TextUtils.isEmpty(shortUrl)) return shortUrl;
 
                 String trackingId = prefs.getString(LocationLogCache.KEY_TRACKING_ID, null);
-                if (!TextUtils.isEmpty(trackingId)) return new ImakaraAPI().getTrackingURL(trackingId);
+                if (!TextUtils.isEmpty(trackingId)) return new ImakaraAPI().getTrackingURLForShare(trackingId);
 
                 return null;
             }

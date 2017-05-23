@@ -68,7 +68,7 @@ public class TrackingIdUpdateService extends IntentService {
     }
 
     private Task<Void> getShortUrl(String trackingId) {
-        String trackingUrl = imakaraAPI.getTrackingURL(trackingId);
+        String trackingUrl = imakaraAPI.getTrackingURLForShare(trackingId);
         return googleAPI.shortenUrl(trackingUrl).onSuccess(task -> {
             String shortUrl = task.getResult();
 
