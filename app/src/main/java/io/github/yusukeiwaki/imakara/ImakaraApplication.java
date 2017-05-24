@@ -17,7 +17,6 @@ public class ImakaraApplication extends Application {
 
         public static void initializeWith(Context context) {
             Resources res = context.getResources();
-            API_HOSTNAME = res.getString(R.string.api_hostname);
             URL_SHORTENER_API_KEY = res.getString(R.string.url_shortener_api_key);
         }
     }

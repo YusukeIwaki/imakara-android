@@ -9,8 +9,10 @@ import android.text.TextUtils;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import io.github.yusukeiwaki.imakara.ImakaraApplication;
+import io.github.yusukeiwaki.imakara.entrypoint.remoteconfig.FirebaseRemoteConfigLoadingActivity;
+import io.github.yusukeiwaki.imakara.entrypoint.remoteconfig.FirebaseRemoteConfigService;
 import io.github.yusukeiwaki.imakara.etc.CurrentUserCache;
+import io.github.yusukeiwaki.imakara.etc.FirebaseRemoteConfigCache;
 import io.github.yusukeiwaki.imakara.fcm.FcmRegistrationService;
 import io.github.yusukeiwaki.imakara.requester.RequesterActivity;
 import io.github.yusukeiwaki.imakara.sender.SenderActivity;
@@ -27,17 +29,27 @@ public class EntryPointActivity extends Activity {
     }
 
     private void launchProperActivity() {
-        Intent intent = getNextActivityIntent();
+        Intent intent = getMainActivityIntent();
 
         final String username = CurrentUserCache.get(this).getString(CurrentUserCache.KEY_USERNAME, null);
-        if (TextUtils.isEmpty(username)) {
-            startActivity(SetupActivity.newIntent(this, intent));
-        } else {
-            startActivity(intent);
+        Intent nextIntent = TextUtils.isEmpty(username) ?
+                SetupActivity.newIntent(this, intent) : intent;
+
+        switch (FirebaseRemoteConfigCache.getCurrentState(this)) {
+            case NO_CONFIG:
+                startActivity(FirebaseRemoteConfigLoadingActivity.newIntent(this, nextIntent));
+                break;
+            case OLD_CONFIG:
+                FirebaseRemoteConfigService.start(this);
+                startActivity(nextIntent);
+                break;
+            case OK:
+                startActivity(nextIntent);
+                break;
         }
     }
 
-    private Intent getNextActivityIntent() {
+    private Intent getMainActivityIntent() {
         Uri uri = null;
         Intent intent = getIntent();
         if (intent != null) {
@@ -45,7 +57,7 @@ public class EntryPointActivity extends Activity {
         }
 
         if (uri != null) {
-            Matcher m = Pattern.compile(String.format("^https://%s/trackings/([^/]+)/location\\.png", ImakaraApplication.ENV.API_HOSTNAME))
+            Matcher m = Pattern.compile(String.format("^https://%s/trackings/([^/]+)/location\\.png", FirebaseRemoteConfigCache.getCachedHostname(this)))
                     .matcher(uri.toString());
             if (m.find()) {
                 String trackingId = m.group(1);

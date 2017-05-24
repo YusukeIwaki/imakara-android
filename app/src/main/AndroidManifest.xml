@@ -21,6 +21,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".entrypoint.remoteconfig.FirebaseRemoteConfigLoadingActivity" android:theme="@style/AppTheme.Translucent.NoTitleBar"/>
+        <service android:name=".entrypoint.remoteconfig.FirebaseRemoteConfigService"/>
         <activity android:name=".setup.SetupActivity"/>
 
         <activity android:name=".sender.SenderActivity"/>
