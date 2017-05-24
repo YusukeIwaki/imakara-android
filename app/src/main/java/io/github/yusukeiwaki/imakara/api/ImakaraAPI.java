@@ -1,11 +1,13 @@
 package io.github.yusukeiwaki.imakara.api;
 
+import android.net.Uri;
 import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import bolts.Task;
+import io.github.yusukeiwaki.imakara.BuildConfig;
 import io.github.yusukeiwaki.imakara.ImakaraApplication;
 import okhttp3.HttpUrl;
 import okhttp3.MediaType;
@@ -55,7 +57,17 @@ public class ImakaraAPI extends APIBase {
     }
 
     public String getTrackingURLForShare(String trackingId) {
-        return buildTrackingUrl(trackingId).toString() + "/location.png";
+        String targetURL = buildTrackingUrl(trackingId).toString() + "/location.png";
+
+        String dynamicLinkUrl = new Uri.Builder()
+                .scheme("https")
+                .authority(ImakaraApplication.ENV.FIREBASE_DYNAMIC_LINK_DOMAIN)
+                .path("/")
+                .appendQueryParameter("link", targetURL)
+                .appendQueryParameter("apn", BuildConfig.APPLICATION_ID)
+                .toString();
+
+        return dynamicLinkUrl;
     }
 
     public Task<JSONObject> getTracking(String trackingId) {
