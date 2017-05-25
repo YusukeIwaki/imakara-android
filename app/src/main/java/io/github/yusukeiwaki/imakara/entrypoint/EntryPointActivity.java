@@ -27,14 +27,7 @@ public class EntryPointActivity extends Activity {
     }
 
     private void launchProperActivity() {
-        Intent intent = getNextActivityIntent();
-
-        final String username = CurrentUserCache.get(this).getString(CurrentUserCache.KEY_USERNAME, null);
-        if (TextUtils.isEmpty(username)) {
-            startActivity(SetupActivity.newIntent(this, intent));
-        } else {
-            startActivity(intent);
-        }
+        startActivity(getNextActivityIntent());
     }
 
     private Intent getNextActivityIntent() {
@@ -51,6 +44,11 @@ public class EntryPointActivity extends Activity {
                 String trackingId = m.group(1);
                 return RequesterActivity.newIntent(this, trackingId);
             }
+        }
+
+        final String username = CurrentUserCache.get(this).getString(CurrentUserCache.KEY_USERNAME, null);
+        if (TextUtils.isEmpty(username)) {
+            return SetupActivity.newIntent(this, SenderActivity.newIntent(this));
         }
 
         return SenderActivity.newIntent(this);
