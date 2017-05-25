@@ -1,6 +1,7 @@
 package io.github.yusukeiwaki.imakara.entrypoint;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -17,6 +18,13 @@ import io.github.yusukeiwaki.imakara.sender.SenderActivity;
 import io.github.yusukeiwaki.imakara.setup.SetupActivity;
 
 public class EntryPointActivity extends Activity {
+
+    public static Intent newIntent(Context context) {
+        Intent intent = new Intent(context, EntryPointActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+        return intent;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
