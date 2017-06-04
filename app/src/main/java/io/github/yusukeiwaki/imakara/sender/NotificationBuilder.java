@@ -7,7 +7,6 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 
 import com.bumptech.glide.Glide;
 import com.mypopsy.maps.StaticMap;
@@ -75,7 +74,7 @@ public class NotificationBuilder {
                 locationCacheItem.lon(),
                 locationCacheItem.accuracy())
                 .buildUrl();
-        Log.d("hoge", "url="+url);
+
         new Thread() {
             @Override
             public void run() {
