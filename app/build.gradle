@@ -9,8 +9,8 @@ android {
         applicationId "io.github.yusukeiwaki.imakara"
         minSdkVersion 17
         targetSdkVersion 25
-        versionCode 3
-        versionName "v1.alpha3"
+        versionCode 4
+        versionName "v1.alpha4"
 
         vectorDrawables.useSupportLibrary = true
     }
