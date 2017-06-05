@@ -27,7 +27,7 @@ public class SenderService extends Service {
         context.startService(newIntent(context, true));
     }
 
-    public static void stop(Context context) {
+    /*package*/ static void stop(Context context) {
         // stopServiceだと、Foreground Serviceの通知が消えない。
         context.startService(newIntent(context, false));
     }

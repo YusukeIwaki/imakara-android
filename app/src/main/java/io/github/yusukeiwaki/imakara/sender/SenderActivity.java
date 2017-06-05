@@ -38,7 +38,7 @@ public class SenderActivity extends BaseActivity {
             startPositioning();
         });
         findViewById(R.id.btn_stop).setOnClickListener(v -> {
-            SenderService.stop(this);
+            SenderCancelService.start(this);
         });
 
         bindingManager = new SenderServiceBindingManager(this);

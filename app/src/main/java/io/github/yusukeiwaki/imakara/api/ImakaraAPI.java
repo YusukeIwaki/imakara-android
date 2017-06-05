@@ -47,6 +47,33 @@ public class ImakaraAPI extends APIBase {
         return baseJsonRequest(req);
     }
 
+    public Task<JSONObject> refreshTracking(String username, String fcmToken, String trackingId) {
+        HttpUrl url = new HttpUrl.Builder()
+                .scheme("https")
+                .host(getHostname())
+                .addPathSegment("trackings")
+                .addPathSegment(trackingId)
+                .build();
+
+        JSONObject json = new JSONObject();
+        try {
+            json.put("user", new JSONObject()
+                    .put("name", username)
+                    .put("gcm_token", fcmToken));
+        } catch (JSONException e) {
+            Log.wtf(TAG, "failed to build JSON.", e);
+        }
+
+        RequestBody body = RequestBody.create(MediaType.parse("application/json"), json.toString());
+
+        Request req = new Request.Builder()
+                .url(url)
+                .patch(body)
+                .build();
+
+        return baseJsonRequest(req);
+    }
+
     private HttpUrl buildTrackingUrl(String trackingId) {
         return new HttpUrl.Builder()
                 .scheme("https")

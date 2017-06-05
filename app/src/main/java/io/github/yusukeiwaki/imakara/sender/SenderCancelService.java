@@ -1,26 +1,35 @@
 package io.github.yusukeiwaki.imakara.sender;
 
-import android.app.IntentService;
+import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.os.IBinder;
 import android.support.annotation.Nullable;
 
 /**
- * {@link SenderService} を止めるサービス
+ * {@link SenderService} を明示的に（ユーザの意志で）止めるサービス
+ * PATCH /trackings/:id を叩く
  */
-public class SenderCancelService extends IntentService {
-    private static final String TAG = SenderCancelService.class.getSimpleName();
-
+public class SenderCancelService extends Service {
     public static Intent newIntent(Context context) {
         return new Intent(context, SenderCancelService.class);
     }
 
-    public SenderCancelService() {
-        super(TAG);
+    public static void start(Context context) {
+        context.startService(SenderCancelService.newIntent(context));
     }
 
     @Override
-    protected void onHandleIntent(@Nullable Intent intent) {
+    public void onCreate() {
+        super.onCreate();
         SenderService.stop(this);
+        TrackingIdRefreshService.start(this);
+        stopSelf();
+    }
+
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
     }
 }

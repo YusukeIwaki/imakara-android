@@ -25,6 +25,7 @@
 
         <activity android:name=".sender.SenderActivity"/>
         <service android:name=".sender.TrackingIdUpdateService"/>
+        <service android:name=".sender.TrackingIdRefreshService"/>
         <activity android:name=".sender.PositioningRequirementCheckAndStartPositioningActivity" android:theme="@style/AppTheme.Translucent.NoTitleBar"/>
         <service android:name=".sender.PositioningService"/>
         <service android:name=".sender.SenderService"/>
