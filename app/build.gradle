@@ -4,7 +4,7 @@ apply plugin: 'me.tatarka.retrolambda'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    buildToolsVersion "25.0.3"
     defaultConfig {
         applicationId "io.github.yusukeiwaki.imakara"
         minSdkVersion 17
@@ -37,8 +37,8 @@ android {
 
 ext {
     supportLibraryVersion = '25.3.1'
-    firebaseVersion = '10.2.4'
-    googlePlayServicesVersion = '10.2.4'
+    firebaseVersion = '11.0.0'
+    googlePlayServicesVersion = '11.0.0'
 }
 
 dependencies {

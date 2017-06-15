@@ -14,18 +14,16 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import io.github.yusukeiwaki.imakara.etc.LocationLogCache;
-
-import static com.google.android.gms.location.LocationServices.FusedLocationApi;
 
 /**
  * 位置情報を測位して、LocationLogCacheに保存する
@@ -84,36 +82,31 @@ public class PositioningService extends Service {
     }
 
     private void doPositioning() {
-        GoogleApiClient googleApiClient = new GoogleApiClient.Builder(this)
-                .addApi(LocationServices.API)
-                .build();
-        ConnectionResult connectionResult = googleApiClient.blockingConnect();
-        if (!connectionResult.isSuccess()) {
-            Log.e(TAG, String.format("onConnectionFailed: [%d] %s", connectionResult.getErrorCode(), connectionResult.getErrorMessage()));
-            stopSelf();
-            return;
-        }
-
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             stopSelf();
             return;
         }
 
         countDownLatch = new CountDownLatch(1);
-        FusedLocationApi.requestLocationUpdates(googleApiClient, buildLocationRequest(), locationListener, positioningThreadLooper);
+        FusedLocationProviderClient client = LocationServices.getFusedLocationProviderClient(this);
+        client.requestLocationUpdates(buildLocationRequest(), locationListener, positioningThreadLooper);
         try {
             if (countDownLatch.await(13, TimeUnit.SECONDS)) {
                 //位置情報が得られた
+                client.removeLocationUpdates(locationListener);
             } else {
                 //タイムアウト
                 Log.i(TAG, "requestLocationUpdates: timeout. Fallback to getLastLocation");
-                Location location = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
-                updateLocationLogCache(location);
+                client.getLastLocation()
+                        .addOnSuccessListener(this::updateLocationLogCache)
+                        .addOnCompleteListener(task -> {
+                            client.removeLocationUpdates(locationListener);
+                        });
+
             }
         } catch (InterruptedException e) {
             Log.e(TAG, e.getMessage(), e);
         }
-        FusedLocationApi.removeLocationUpdates(googleApiClient, locationListener);
         serviceThreadHandler.post(() -> {
             stopSelf();
         });
@@ -127,10 +120,18 @@ public class PositioningService extends Service {
                 ;
     }
 
-    private LocationListener locationListener = location -> {
+    private LocationCallback locationListener = new LocationCallback() {
+        @Override
+        public void onLocationResult(LocationResult locationResult) {
+            super.onLocationResult(locationResult);
+            onNewLocation(locationResult.getLastLocation());
+        }
+    };
+
+    private void onNewLocation(Location location) {
         updateLocationLogCache(location);
         countDownLatch.countDown();
-    };
+    }
 
     private void updateLocationLogCache(Location location) {
         LocationLogCache.get(this).edit()
